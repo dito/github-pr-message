@@ -1,26 +1,46 @@
 require 'octokit'
 require 'erb'
+require 'pry'
 
 module Events
   class Base
     private
 
     def get_list_commits
-      list_commits = client.pull_commits("#{organization_name}/#{repository_name}", pull_request_number)
+      @list_commits = client.pull_commits("#{organization_name}/#{repository_name}", pull_request_number)
 
-      @commit_titles = list_commits.map(&:commit).map(&:message).each_with_object([]){ |s, a|s =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m; a << [$1, $2].join(' ') if $1}
+      set_merge_commits
+      get_merge_commit_numbers
+      update_assignees
+    end
+
+    def set_merge_commits
+      @merge_commits = @list_commits.select{ |s|s['commit']['message'] =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m}
+    end
+
+    def get_merge_commit_numbers
+      @merge_commit_number_and_titles = @merge_commits.map(&:commit).map(&:message).each_with_object([]){ |s, a|s =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m; a << [$1, $2] if $1}
+      @merge_commit_numbers = @merge_commit_number_and_titles.map(&:first).map{ |s|s[1..-1] }
+    end
+
+    def update_assignees
+      @assignees ||= []
+      @assignees += @merge_commit_numbers.flat_map do |commit_number|
+        assignees = client.issue("#{organization_name}/#{repository_name}", commit_number)[:assignees] || []
+        assignees.map{ |assignee| assignee['login'] }
+      end.compact
     end
 
     def decorate_body
-      commit_title_text = ERB::Util.html_escape(@commit_titles.join("\n"))
+      commit_title_text = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|a.join(' ')}.join("\n"))
 
       @decorate_body = <<EOS
 サービス： #{repository_name}
 PR_url： #{pull_request_url}
 説明：
 #{commit_title_text}
-実装者：
-レビュワー：
+実装者： #{auther_name}
+レビュワー： #{@assignees.uniq.join(' ')}
 EOS
     end
 
@@ -56,6 +76,10 @@ EOS
 
     def pull_request_url
       payload.dig('pull_request', 'html_url')
+    end
+
+    def auther_name
+      payload.dig('pull_request', 'assignee', 'login')
     end
   end
 end
