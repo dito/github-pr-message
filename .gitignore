@@ -1,0 +1,5 @@
+.envrc
+.ruby-version
+.bundle
+vendor/bin/
+vendor/bundle
