@@ -46,7 +46,7 @@ EOS
     def update_pull_request
       client.update_issue("#{organization_name}/#{repository_name}", pull_request_number, body: decorate_body)
     rescue Octokit::NotFound
-      puts "Does #{team_name} have 'write' permission?"
+      puts "Does #{repository_name} have 'write' permission?"
     end
 
     def client
@@ -54,7 +54,7 @@ EOS
     end
 
     def team
-      @team ||= client.organization_teams(organization_name, { per_page: 100 })&.find { |t| t['name'] == team_name }
+      @team ||= client.organization_teams(organization_name, { per_page: 100 })&.find { |t| t['name'] == repository_name }
     end
 
     def repository_name
@@ -63,14 +63,6 @@ EOS
 
     def organization_name
       payload.dig('repository', 'full_name')&.split('/')&.first
-    end
-
-    def team_name_by_phrase(content)
-      return @team_name if @team_name ||= nil
-
-      assign_phrase = ENV.fetch('ASSIGN_PHRASE') # Please assign %team
-      assign_phrase_pattern = Regexp.new(assign_phrase.sub('%team', '(?<team_name>.+)'))
-      @team_name = content&.match(assign_phrase_pattern)&.[](:team_name)
     end
 
     def pull_request_url

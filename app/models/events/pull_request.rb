@@ -52,9 +52,5 @@ module Events
     def opened?
       payload['action'] == 'opened'
     end
-
-    def team_name
-      team_name_by_phrase(pull_request_body) || repository_name
-    end
   end
 end
