@@ -1,6 +1,5 @@
 require 'octokit'
 require 'erb'
-require 'pry'
 
 module Events
   class Base
