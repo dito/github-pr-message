@@ -9,13 +9,15 @@ module Events
     end
 
     def hook
-      return unless payload
+      return if payload.nil? || payload.empty?
       return unless r2m_title?
       return unless r2m_branch?
-      return unless body_blank?
+      return unless body_empty?
       return unless opened?
+      return unless repository_white?
 
-      get_list_commits
+      set_merge_commit_number_and_titles
+      set_body_params
       update_pull_request
     end
 
@@ -37,8 +39,8 @@ module Events
       payload.dig('pull_request', 'base', 'ref') == 'master'
     end
 
-    def body_blank?
-      pull_request_body == ""
+    def body_empty?
+      pull_request_body.empty?
     end
 
     def pull_request_body
@@ -51,10 +53,6 @@ module Events
 
     def opened?
       payload['action'] == 'opened'
-    end
-
-    def team_name
-      team_name_by_phrase(pull_request_body) || repository_name
     end
   end
 end
