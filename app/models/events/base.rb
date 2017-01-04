@@ -5,40 +5,45 @@ module Events
   class Base
     private
 
-    def get_list_commits
-      @list_commits = client.pull_commits("#{organization_name}/#{repository_name}", pull_request_number)
-
-      set_merge_commits
-      get_merge_commit_numbers
-      update_assignees
+    def get_commits
+      client.pull_commits("#{organization_name}/#{repository_name}", pull_request_number)
     end
 
-    def set_merge_commits
-      @merge_commits = @list_commits.select{ |s|s['commit']['message'] =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m}
+    def merge_commits
+      get_commits.select{ |s|s['commit']['message'] =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m}
     end
 
-    def get_merge_commit_numbers
-      @merge_commit_number_and_titles = @merge_commits.map(&:commit).map(&:message).each_with_object([]){ |s, a|s =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m; a << [$1, $2] if $1}
-      @merge_commit_numbers = @merge_commit_number_and_titles.map(&:first).map{ |s|s[1..-1] }
+    def set_merge_commit_number_and_titles
+      @merge_commit_number_and_titles =
+        merge_commits
+          .map(&:commit)
+          .map(&:message)
+          .each_with_object([]) do |s, a|
+            s =~ /\AMerge pull request #(\d)+ from .*\n\n(.+)\Z/m
+            a << { number: $1, title: $2 } if $1
+          end
     end
 
-    def update_assignees
-      @assignees ||= []
-      @assignees += @merge_commit_numbers.flat_map do |commit_number|
-        assignees = client.issue("#{organization_name}/#{repository_name}", commit_number)[:assignees] || []
-        assignees.map{ |assignee| assignee['login'] }
-      end.compact
+    def set_body_params
+      @relese_contents = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|'#' + a[:number] + ' ' + a[:title]}.join("\n"))
+      merge_commit_numbers = @merge_commit_number_and_titles.map{ |h| h[:number] }
+
+      @developers, @assignees = [], []
+
+      merge_commit_numbers.each do |merge_commit_number|
+        @merge_commit_issue = client.issue("#{organization_name}/#{repository_name}", merge_commit_number)
+        @developers << @merge_commit_issue[:user][:login]
+        @assignees << @merge_commit_issue[:assignees]&.map{ |assignee| assignee['login'] }
+      end
     end
 
     def decorate_body
-      commit_title_text = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|a.join(' ')}.join("\n"))
-
       @decorate_body = <<EOS
 サービス： #{repository_name}
 PR_url： #{pull_request_url}
 説明：
-#{commit_title_text}
-実装者： #{auther_name}
+#{@relese_contents}
+実装者： #{@developers.uniq.join(' ')}
 レビュワー： #{@assignees.uniq.join(' ')}
 EOS
     end
@@ -51,10 +56,6 @@ EOS
 
     def client
       @client ||= Octokit::Client.new(access_token: ENV.fetch('GITHUB_API_TOKEN'))
-    end
-
-    def team
-      @team ||= client.organization_teams(organization_name, { per_page: 100 })&.find { |t| t['name'] == repository_name }
     end
 
     def repository_name
@@ -71,6 +72,11 @@ EOS
 
     def auther_name
       payload.dig('pull_request', 'assignee', 'login')
+    end
+
+    def repository_white?
+      repos_white_list = ENV.fetch('TARGET_REPOS').split(',')
+      repos_white_list.include?(organization_name)
     end
   end
 end
