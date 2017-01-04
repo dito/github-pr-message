@@ -1,0 +1,4 @@
+export TOKEN=
+export GITHUB_API_TOKEN=
+export HTTP_X_GITHUB_EVENT='pull_request'
+export TARGET_REPOS=
