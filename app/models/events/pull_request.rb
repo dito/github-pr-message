@@ -40,7 +40,7 @@ module Events
     end
 
     def body_empty?
-      pull_request_body.empty?
+      pull_request_body.empty? || pull_request_body == "\r\n"
     end
 
     def pull_request_body
