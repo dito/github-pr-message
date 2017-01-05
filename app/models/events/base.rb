@@ -76,7 +76,7 @@ EOS
 
     def repository_white?
       repos_white_list = ENV.fetch('TARGET_REPOS').split(',')
-      repos_white_list.include?(organization_name)
+      repos_white_list.include?(organization_name + '/' + repository_name)
     end
   end
 end
