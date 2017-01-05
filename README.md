@@ -32,7 +32,6 @@
   - github の パーソナルトークン
   - 必須スコープ
     - repos
-    - admin:repo_hook
   - ![image](https://raw.githubusercontent.com/jabropt/github-pr-message/image/images/github_api_token.png)
 
 - TARGET_REPOS
