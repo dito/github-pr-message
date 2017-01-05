@@ -1,27 +1,40 @@
 # github-pull-message
 
 ## 概要
-r2mのpullreqの説明文を自動で作るやつ。
+`release` ブランチから `master` ブランチへプルリクを作ったときに、  
+プルリクの説明文を、含まれるマージコミットから生成します。
 
 ## 条件
 - タイトルが `r2m`
-- `release` から `master`への pull req
-- pull req を作ったときの説明文が空
+- 説明文が空
+- `release` から `master`へのプルリク
+- 最後にページをリロード
 
+## setup
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-## Setup
+## environment variables
 
-### SECRET_TOKEN
+`heroku config:set 環境変数名=セットしたい値`
 
-Please set secret token for GitHub Webhook which you'll put on 'secret' field.
+- SECRET_TOKEN
+  - githubのwebhookのためのシークレット
+  - `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)'` などで作る
+  - 該当repository -> Setting -> Webhooks -> Secret
+  - ![image](https://raw.githubusercontent.com/jabropt/github-pr-message/image/images/secret_token.png)
 
-githubのhookを受け取るエントリーポイント
+- ENTRY_POINT
+  - githubのwebhookを受け取るエントリーポイント
+  - 該当repository -> Setting -> Webhooks -> Payload URL
+  - ![image](https://raw.githubusercontent.com/jabropt/github-pr-message/image/images/entry_point.png)
 
-### GITHUB_API_TOKEN
+- GITHUB_API_TOKEN
+  - github の パーソナルトークン
+  - 必須スコープ
+    - repos
+    - admin:repo_hook
+  - ![image](https://raw.githubusercontent.com/jabropt/github-pr-message/image/images/github_api_token.png)
 
-Please set Personal access token for your GitHub account(or Bot account) which has following permissions.
-
-### TARGET_REPOS
-
-- CSV形式でリポジトリを指定
-- ex `user/repo,org/repo`
+- TARGET_REPOS
+  - CSV形式でリポジトリを指定
+  - ex `user/repo,org/repo`
