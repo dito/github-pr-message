@@ -6,7 +6,7 @@ require './app/models/webhook'
 class App < Sinatra::Base
   use Rack::GithubWebhooks, secret: ENV.fetch('SECRET_TOKEN', '')
 
-  post "/#{ENV['TOKEN']}" do
+  post "/#{ENV['ENTRY_POINT']}" do
     Webhook.run(event_type: request.env['HTTP_X_GITHUB_EVENT'], payload: payload)
     [204]
   end

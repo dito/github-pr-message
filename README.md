@@ -1,27 +1,31 @@
 # github-pull-message
 
 ## 概要
-r2mのpullreqの説明文を自動で作るやつ。
+`release` ブランチから `master` ブランチへプルリクを作ったときに、
+プルリクの説明文を、含まれるマージコミットから生成します。
 
 ## 条件
 - タイトルが `r2m`
-- `release` から `master`への pull req
-- pull req を作ったときの説明文が空
+- 説明文が空
+- `release` から `master`へのプルリク
+- 最後にページをリロード
 
+## environment variables
 
-## Setup
+- SECRET_TOKEN
+  - githubのwebhookのためのシークレット
+  - `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)'` などで作る
+  - 該当repository -> Setting -> Webhooks -> Secret
 
-### SECRET_TOKEN
+- ENTRY_POINT
+  - githubのwebhookを受け取るエントリーポイント
+  - 該当repository -> Setting -> Webhooks -> Payload URL
 
-Please set secret token for GitHub Webhook which you'll put on 'secret' field.
+- GITHUB_API_TOKEN
+  - github の パーソナルトークン
+  - 必須スコープ
+    - repos
 
-githubのhookを受け取るエントリーポイント
-
-### GITHUB_API_TOKEN
-
-Please set Personal access token for your GitHub account(or Bot account) which has following permissions.
-
-### TARGET_REPOS
-
-- CSV形式でリポジトリを指定
-- ex `user/repo,org/repo`
+- TARGET_REPOS
+  - CSV形式でリポジトリを指定
+  - ex `user/repo,org/repo`
