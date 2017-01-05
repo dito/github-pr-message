@@ -52,7 +52,7 @@ module Events
     end
 
     def opened?
-      payload['action'] == 'opened'
+      ['opened', 'reopened'].include?(payload['action'])
     end
   end
 end
