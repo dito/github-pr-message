@@ -15,7 +15,7 @@ ruby '2.3.3'
 ## installation
 clone して `bundle install`
 ## usage
-`bundle exec rackup`
+`bundle exec rackup config.ru -p $PORT`
 rack立ち上げて
 `http://localhost:9292/{{ENTRY_POINT}}`
 で webhook を受け取る
