@@ -10,12 +10,17 @@
 - `release` から `master`へのプルリク
 - 最後にページをリロード
 
-## setup
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+## requirement
+ruby '2.3.3'
+## installation
+clone して `bundle install`
+## usage
+`bundle exec rackup`
+rack立ち上げて
+`http://localhost:9292/{{ENTRY_POINT}}`
+で webhook を受け取る
 
 ## environment variables
-
-`heroku config:set 環境変数名=セットしたい値`
 
 - SECRET_TOKEN
   - githubのwebhookのためのシークレット
@@ -37,3 +42,8 @@
 - TARGET_REPOS
   - CSV形式でリポジトリを指定
   - ex `user/repo,org/repo`
+
+## herokuで動かす例
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+heroku config:set 環境変数名=セットしたい値
