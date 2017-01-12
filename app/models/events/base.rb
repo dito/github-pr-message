@@ -1,5 +1,6 @@
 require 'octokit'
 require 'erb'
+require 'yaml'
 
 module Events
   class Base
@@ -43,8 +44,8 @@ module Events
 PR_url： #{pull_request_url}
 説明：
 #{@relese_contents}
-実装者： #{@developers.uniq.join(' ')}
-レビュワー： #{@assignees.uniq.join(' ')}
+実装者： #{display_names(@developers)}
+レビュワー： #{display_names(@assignees)}
 EOS
     end
 
@@ -77,6 +78,12 @@ EOS
     def repository_white?
       repos_white_list = ENV.fetch('TARGET_REPOS').split(',')
       repos_white_list.include?(organization_name + '/' + repository_name)
+    end
+
+    def display_names(user_ids)
+      config = YAML.load_file('./config/user_names.yml')
+
+      user_ids.uniq.map { |user_id| config.send('[]', user_id) }.join('、')
     end
   end
 end
