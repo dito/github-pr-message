@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 gem 'rack-github_webhooks'
 gem 'sinatra'
+gem 'sinatra-contrib'
 gem 'rake'
 gem 'octokit'
 gem 'puma'
