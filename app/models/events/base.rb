@@ -83,7 +83,7 @@ EOS
     def display_names(user_ids)
       config = YAML.load_file('./config/user_names.yml')
 
-      user_ids.uniq.map { |user_id| config.send('[]', user_id) }.join('、')
+      user_ids.uniq.map { |user_id| config['github_user_ids'].send('[]', user_id) }.join('、')
     end
   end
 end
