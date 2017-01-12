@@ -13,7 +13,7 @@ module Events
       return unless r2m_title?
       return unless r2m_branch?
       return unless body_empty?
-      return unless opened?
+      return unless opened_or_edited?
       return unless repository_white?
 
       set_merge_commit_number_and_titles
@@ -51,8 +51,8 @@ module Events
       payload.dig('pull_request', 'number')
     end
 
-    def opened?
-      ['opened', 'reopened'].include?(payload['action'])
+    def opened_or_edited?
+      ['opened', 'reopened', 'edited'].include?(payload['action'])
     end
   end
 end
