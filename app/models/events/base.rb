@@ -10,7 +10,7 @@ module Events
     end
 
     def merge_commits
-      get_commits.select{ |s|s['commit']['message'] =~ /\AMerge pull request (#\d)+ from .*\n\n(.+)\Z/m}
+      get_commits.select{ |s| s['commit']['message'] =~ /\AMerge pull request (#\d+) from .*\n\n(.+)\Z/m }
     end
 
     def set_merge_commit_number_and_titles
@@ -19,7 +19,7 @@ module Events
           .map(&:commit)
           .map(&:message)
           .each_with_object([]) do |s, a|
-            s =~ /\AMerge pull request #(\d)+ from .*\n\n(.+)\Z/m
+            s =~ /\AMerge pull request #(\d+) from .*\n\n(.+)\Z/m
             a << { number: $1, title: $2 } if $1
           end
     end
