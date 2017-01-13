@@ -4,3 +4,4 @@
 vendor/bin/
 vendor/bundle
 config
+json-file.json
