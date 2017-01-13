@@ -45,7 +45,7 @@ PR_url： #{pull_request_url}
 説明：
 #{@relese_contents}
 実装者： #{display_names(@developers)}
-レビュワー： #{display_names(@assignees)}
+レビュワー： #{display_names(@assignees.flatten)}
 EOS
     end
 
