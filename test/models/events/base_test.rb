@@ -2,10 +2,10 @@ require File.expand_path '../../../test_helper.rb', __FILE__
 
 class Events::BaseTest < MiniTest::Test
   def test_merge_commits
-    assert_equal proper_commits, Events::Base.new.send(:merge_commits, get_commits)
+    assert_equal proper_commits, Events::Base.new.send(:merge_commits, included_all_commits)
   end
 
-  def get_commits
+  def included_all_commits
     proper_commits + unproper_commits
   end
   def proper_commits
