@@ -10,7 +10,7 @@ module Events
       client.pull_commits("#{organization_name}/#{repository_name}", pull_request_number)
     end
 
-    def merge_commits
+    def merge_commits(get_commits)
       get_commits.select{ |s| s['commit']['message'] =~ /\AMerge pull request (#\d+) from .*\n\n(.+)\Z/m }
     end
 
