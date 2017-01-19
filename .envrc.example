@@ -1,0 +1,4 @@
+export SECRET_TOKEN=
+export ENTRY_POINT=
+export GITHUB_API_TOKEN=
+export TARGET_REPOS=
