@@ -3,7 +3,6 @@ require 'rack/github_webhooks'
 require 'sinatra/base'
 
 class App < Sinatra::Base
-
   use Rack::GithubWebhooks, secret: ENV.fetch('SECRET_TOKEN', '')
 
   post "/#{ENV['ENTRY_POINT']}" do
