@@ -6,34 +6,31 @@ class PullRequest
 
   REG_COMMIT_MESSAGE = /\AMerge pull request (#\d+) from .*\n\n(.+)\Z/m
 
-  def initialize
-    @payload = JSON.parse(request.body.read) rescue {}
-    set_instance_variables if !@payload.nil? || !@payload.empty?
+  def initialize(payload)
+    set_instance_variables(payload)
   end
 
   def run
     return unless should_run?
-    set_body_params
     update_pull_request
   end
 
   private
 
-  def set_instance_variables
-    @organization_name = @payload.dig('repository', 'full_name')&.split('/')&.first
-    @repository_name = @payload.dig('repository', 'name')
-    @repository = @organization_name + '/' + @repository_name
-    @action =  @payload.dig('action')
-    @title = @payload.dig('pull_request', 'title')
-    @body = @payload.dig('pull_request', 'body')
-    @head_branch = @payload.dig('pull_request', 'head', 'ref')
-    @base_branch = @payload.dig('pull_request', 'base', 'ref')
-    @number = @payload.dig('pull_request', 'number')
-    @html_url = @payload.dig('pull_request', 'html_url')
+  def set_instance_variables(payload)
+    @organization_name = payload.dig('repository', 'full_name')&.split('/')&.first
+    @repository_name = payload.dig('repository', 'name')
+    @repository = organization_name + '/' + @repository_name
+    @action =  payload.dig('action')
+    @title = payload.dig('pull_request', 'title')
+    @body = payload.dig('pull_request', 'body')
+    @head_branch = payload.dig('pull_request', 'head', 'ref')
+    @base_branch = payload.dig('pull_request', 'base', 'ref')
+    @number = payload.dig('pull_request', 'number')
+    @html_url = payload.dig('pull_request', 'html_url')
   end
 
   def should_run?
-    return if @payload.nil? || @payload.empty?
     return unless @title == 'r2m'
     return unless @head_branch == 'release' && @base_branch == 'master'
     return unless @body.empty? || @body == "\r\n"
@@ -71,6 +68,7 @@ class PullRequest
   end
 
   def update_pull_request
+    set_body_params
     client.update_issue(@repository, @number, body: decorate_body)
   rescue Octokit::NotFound
     puts "Does #{@repository_name} have 'write' permission?"
