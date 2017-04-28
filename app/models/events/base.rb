@@ -44,8 +44,8 @@ module Events
 PR_url： #{pull_request_url}
 説明：
 #{@relese_contents}
-実装者： #{@developers.uniq.join(', ')}
-レビュワー： #{@assignees.uniq.join(', ')}
+実装者： #{@developers.flatten.uniq.join(', ')}
+レビュワー： #{@assignees.flatten.uniq.join(', ')}
 EOS
     end
 
