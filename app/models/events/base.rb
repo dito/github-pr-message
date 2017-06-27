@@ -26,7 +26,7 @@ module Events
     end
 
     def set_body_params
-      @relese_contents = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|'#' + a[:number] + ' ' + a[:title]}.join("\n"))
+      @relese_contents = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|'#' + a[:number] + ' ' + a[:title].gsub('[ci skip]', '')}.join("\n"))
       merge_commit_numbers = @merge_commit_number_and_titles.map{ |h| h[:number] }
 
       @developers, @assignees = [], []
