@@ -44,6 +44,7 @@ PR_url： #{pull_request_url}
 #{@relese_contents}
 実装者： #{@developers.flatten.uniq.join(', ')}
 レビュワー： #{@reviewers.flatten.uniq.join(', ')}
+#{template}
 EOS
     end
 
@@ -61,6 +62,8 @@ EOS
       payload.dig('repository', 'name')
     end
 
+    alias_method :team_name, :repository_name
+
     def organization_name
       payload.dig('repository', 'full_name')&.split('/')&.first
     end
@@ -76,6 +79,14 @@ EOS
     def repository_white?
       repos_white_list = ENV.fetch('TARGET_REPOS').split(',')
       repos_white_list.include?(organization_name + '/' + repository_name)
+    end
+
+    def template
+      @template ||= (team['description'] =~ /r2mテンプレ:(.*)/m; $1)
+    end
+
+    def team
+      @team ||= client.organization_teams(organization_name, { per_page: 100 })&.find { |t| t['name'] == team_name }
     end
   end
 end
