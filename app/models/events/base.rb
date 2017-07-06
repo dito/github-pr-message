@@ -31,8 +31,9 @@ module Events
 
       merge_commit_numbers.each do |merge_commit_number|
         @merge_commit_issue = client.issue("#{organization_name}/#{repository_name}", merge_commit_number)
+        pull_request_review_requests = client.pull_request_review_requests("#{organization_name}/#{repository_name}", merge_commit_number)
         @developers << @merge_commit_issue[:user][:login]
-        @reviewers << @merge_commit_issue[:requested_reviewers]&.map{ |reviewer| reviewer['login'] }
+        @reviewers << pull_request_review_requests&.map{ |reviewer| reviewer['login'] }
       end
     end
 
