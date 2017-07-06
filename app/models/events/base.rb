@@ -1,6 +1,4 @@
 require 'octokit'
-require 'erb'
-require 'yaml'
 
 module Events
   class Base
@@ -29,12 +27,12 @@ module Events
       @relese_contents = ERB::Util.html_escape(@merge_commit_number_and_titles.map{|a|'#' + a[:number] + ' ' + a[:title].gsub('[ci skip]', '')}.join("\n"))
       merge_commit_numbers = @merge_commit_number_and_titles.map{ |h| h[:number] }
 
-      @developers, @assignees = [], []
+      @developers, @reviewers = [], []
 
       merge_commit_numbers.each do |merge_commit_number|
         @merge_commit_issue = client.issue("#{organization_name}/#{repository_name}", merge_commit_number)
         @developers << @merge_commit_issue[:user][:login]
-        @assignees << @merge_commit_issue[:assignees]&.map{ |assignee| assignee['login'] }
+        @reviewers << @merge_commit_issue[:requested_reviewers]&.map{ |reviewer| reviewer['login'] }
       end
     end
 
@@ -45,7 +43,7 @@ PR_url： #{pull_request_url}
 説明：
 #{@relese_contents}
 実装者： #{@developers.flatten.uniq.join(', ')}
-レビュワー： #{@assignees.flatten.uniq.join(', ')}
+レビュワー： #{@reviewers.flatten.uniq.join(', ')}
 EOS
     end
 
