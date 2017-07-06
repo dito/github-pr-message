@@ -54,7 +54,7 @@ EOS
     end
 
     def client
-      @client ||= Octokit::Client.new(access_token: ENV.fetch('GITHUB_API_TOKEN'))
+      @client ||= Octokit::Client.new(access_token: ENV.fetch('GITHUB_API_TOKEN'), auto_paginate: true)
     end
 
     def repository_name
