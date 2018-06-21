@@ -83,7 +83,7 @@ EOS
     end
 
     def template
-      @template ||= (team['description'] =~ /r2mテンプレ:(.*)/m; $1)
+      @template ||= (team['description'] =~ /r2mテンプレ:(.*)/m; $1) unless team.nil?
     end
 
     def team
